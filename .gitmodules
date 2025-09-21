@@ -1,0 +1,12 @@
+[submodule "authservice"]
+	path = authservice
+	url = https://github.com/Bhupesh2001/Auth-Service.git
+[submodule "userservice"]
+	path = userservice
+	url = https://github.com/Bhupesh2001/User-Service.git
+[submodule "expenseservice"]
+	path = expenseservice
+	url = https://github.com/Bhupesh2001/Expense-Service.git
+[submodule "chatbotservice"]
+	path = chatbotservice
+	url = https://github.com/Bhupesh2001/Chatbot-Service.git
