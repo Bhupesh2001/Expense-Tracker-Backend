@@ -1,0 +1,137 @@
+# docker-compose.yml, outer file to run all services together
+services:
+  kafka:
+    image: apache/kafka:3.7.0
+
+    ports:
+      - "9092:9092"
+    environment:
+      KAFKA_NODE_ID: 1
+      KAFKA_PROCESS_ROLES: "controller, broker"
+      KAFKA_CONTROLLER_QUORUM_VOTERS: "1@kafka:9093"
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: "CONTROLLER:PLAINTEXT, PLAINTEXT:PLAINTEXT"
+      KAFKA_LISTENERS: "PLAINTEXT://0.0.0.0:9092,CONTROLLER://:9093"
+      KAFKA_ADVERTISED_LISTENERS: "PLAINTEXT://kafka:9092"
+      KAFKA_CONTROLLER_LISTENER_NAMES: "CONTROLLER"
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+
+
+  mysql:
+    image: mysql:8.3.0
+    container_name: mysql-8.3.0
+    restart: always
+    environment:
+      MYSQL_USER: test
+      MYSQL_PASSWORD: 'Bhupesh@2001'
+      MYSQL_ROOT_PASSWORD: 'Bhupesh@2001'
+    ports:
+      - '3306:3306'
+    expose:
+      - '3306'
+    volumes:
+      - mysql-db:/var/lib/mysql
+    healthcheck:
+      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-pBhupesh@2001" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+
+  user-service:
+    build: ./userservice
+    image: user-service
+    container_name: user-service
+    environment:
+      KAFKA_HOST: kafka
+      MYSQL_HOST: mysql
+      MYSQL_USER: test
+      MYSQL_PASSWORD: 'Bhupesh@2001'
+    ports:
+      - '9810:9810'
+    depends_on:
+      kafka:
+        condition: service_started
+      mysql:
+          condition: service_healthy
+
+  auth-service:
+    build: ./authservice
+    image: auth-service
+    container_name: auth-service
+    environment:
+      KAFKA_HOST: kafka
+      MYSQL_HOST: mysql
+      MYSQL_USER: test
+      MYSQL_PASSWORD: 'Bhupesh@2001'
+    ports:
+      - '9898:9898'
+    depends_on:
+      kafka:
+        condition: service_started
+      mysql:
+        condition: service_healthy
+
+  expense-service:
+    build: ./expenseservice
+    image: expense-service
+    container_name: expense-service
+    environment:
+      KAFKA_HOST: kafka
+      MYSQL_HOST: mysql
+      MYSQL_USER: test
+      MYSQL_PASSWORD: 'Bhupesh@2001'
+    ports:
+      - '9820:9820'
+    depends_on:
+      kafka:
+        condition: service_started
+      mysql:
+        condition: service_healthy
+
+  chatbot-service:
+    build: ./chatbotservice
+    image: chatbot-service
+    container_name: chatbot-service
+    environment:
+      KAFKA_HOST: kafka
+      MYSQL_HOST: mysql
+      MYSQL_USER: test
+      MYSQL_PASSWORD: 'Bhupesh@2001'
+      GOOGLE_API_KEY: 'AIzaSyA55MWLmT-Egs6MlG0_Zzhj746R0lGA8dU'
+    ports:
+      - '8081:8081'
+    depends_on:
+      kafka:
+        condition: service_started
+      mysql:
+        condition: service_healthy
+
+  kong:
+    image: kong
+    volumes:
+      - "./config:/usr/local/kong/declarative"
+    environment:
+      KONG_DATABASE: off
+      KONG_DECLARATIVE_CONFIG: /usr/local/kong/declarative/kong.yml
+      KONG_PROXY_ACCESS_LOG: /dev/stdout
+      KONG_ADMIN_ACCESS_LOG: /dev/stdout
+      KONG_PROXY_ERROR_LOG: /dev/stderr
+      KONG_ADMIN_ERROR_LOG: /dev/stderr
+      KONG_ADMIN_LISTEN: 0.0.0.0:8001, 0.0.0.0:8444 ssl
+      KONG_LOG_LEVEL: debug
+      KONG_PLUGINS: bundled
+    ports:
+      - "8005:8000/tcp"
+      - "127.0.0.1:7990:8001/tcp"
+      - "8443:8443/tcp"
+      - "127.0.0.1:8444:8444/tcp"
+    depends_on:
+      kafka:
+        condition: service_started
+      mysql:
+        condition: service_healthy
+
+
+volumes:
+  mysql-db:
+    driver: local
