@@ -10,3 +10,6 @@
 [submodule "chatbotservice"]
 	path = chatbotservice
 	url = https://github.com/Bhupesh2001/Chatbot-Service.git
+[submodule "config"]
+	path = config
+	url = https://github.com/Bhupesh2001/Expense-Service-Config-Backend.git
