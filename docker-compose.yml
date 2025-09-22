@@ -2,7 +2,6 @@
 services:
   kafka:
     image: apache/kafka:3.7.0
-
     ports:
       - "9092:9092"
     environment:
@@ -11,7 +10,8 @@ services:
       KAFKA_CONTROLLER_QUORUM_VOTERS: "1@kafka:9093"
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: "CONTROLLER:PLAINTEXT, PLAINTEXT:PLAINTEXT"
       KAFKA_LISTENERS: "PLAINTEXT://0.0.0.0:9092,CONTROLLER://:9093"
-      KAFKA_ADVERTISED_LISTENERS: "PLAINTEXT://kafka:9092"
+#      KAFKA_ADVERTISED_LISTENERS: "PLAINTEXT://kafka:9092"    # # use this when app running on docker want ot communicate to kafka
+      KAFKA_ADVERTISED_LISTENERS: "PLAINTEXT://localhost:9092" # use this when app running on localhost want ot communicate to kafka
       KAFKA_CONTROLLER_LISTENER_NAMES: "CONTROLLER"
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
 
