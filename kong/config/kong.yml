@@ -1,0 +1,55 @@
+_format_version: "2.1"
+_transform: true
+
+services:
+  # User Service
+  - name: user-service
+    url: http://user-service:9810
+    routes:
+      - name: user-route
+        paths:
+          - /user/v1
+        strip_path: false
+        preserve_host: false
+    plugins:
+      - name: custom-auth
+        config:
+          auth_service_url: "http://auth-service:9898/auth/v1/ping"
+
+  # Auth Service (no auth needed for login/register)
+  - name: auth-service
+    url: http://auth-service:9898
+    routes:
+      - name: auth-route
+        paths:
+          - /auth/v1
+        strip_path: false
+        preserve_host: false
+
+  # Expense Service
+  - name: expense-service
+    url: http://expense-service:9820
+    routes:
+      - name: expense-route
+        paths:
+          - /expense/v1
+        strip_path: false
+        preserve_host: false
+    plugins:
+      - name: custom-auth
+        config:
+          auth_service_url: "http://auth-service:9898/auth/v1/ping"
+
+  # Chatbot Service
+  - name: chatbot-service
+    url: http://chatbot-service:8081
+    routes:
+      - name: chatbot-route
+        paths:
+          - /api/ai
+        strip_path: false
+        preserve_host: false
+    plugins:
+      - name: custom-auth
+        config:
+          auth_service_url: "http://auth-service:9898/auth/v1/ping"

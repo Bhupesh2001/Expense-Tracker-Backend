@@ -4,7 +4,6 @@
     <mapping directory="$PROJECT_DIR$" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/authservice" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/chatbotservice" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/config" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/expenseservice" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/userservice" vcs="Git" />
   </component>
