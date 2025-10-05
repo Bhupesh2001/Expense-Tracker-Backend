@@ -14,7 +14,8 @@ services:
 #      KAFKA_ADVERTISED_LISTENERS: "PLAINTEXT://localhost:9092" # use this when app running on localhost want ot communicate to kafka
       KAFKA_CONTROLLER_LISTENER_NAMES: "CONTROLLER"
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
-
+    networks:
+      - expense-tracker-network
 
   mysql:
     image: mysql:8.3.0
@@ -35,7 +36,8 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
-
+    networks:
+      - expense-tracker-network
 
   user-service:
     build: ./userservice
@@ -52,7 +54,9 @@ services:
       kafka:
         condition: service_started
       mysql:
-          condition: service_healthy
+        condition: service_healthy
+    networks:
+      - expense-tracker-network
 
   auth-service:
     build: ./authservice
@@ -70,6 +74,8 @@ services:
         condition: service_started
       mysql:
         condition: service_healthy
+    networks:
+      - expense-tracker-network
 
   expense-service:
     build: ./expenseservice
@@ -87,6 +93,8 @@ services:
         condition: service_started
       mysql:
         condition: service_healthy
+    networks:
+      - expense-tracker-network
 
   chatbot-service:
     build: ./chatbotservice
@@ -105,6 +113,8 @@ services:
         condition: service_started
       mysql:
         condition: service_healthy
+    networks:
+      - expense-tracker-network
 
   kong-service:
     image: kong:latest
@@ -127,7 +137,12 @@ services:
       - "127.0.0.1:7990:8001/tcp"
       - "8443:8443/tcp"
       - "127.0.0.1:8444:8444/tcp"
+    networks:
+      - expense-tracker-network
 
+networks:
+  expense-tracker-network:
+    driver: bridge
 
 volumes:
   mysql-db:
